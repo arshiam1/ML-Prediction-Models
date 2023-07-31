@@ -4,7 +4,7 @@
 # In[2]:
 
 
-############### WEEK 11 - Intermediate Programming with Data ################
+
 # Supervised Learning
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
