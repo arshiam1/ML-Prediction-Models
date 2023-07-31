@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[2]:
+
+
+############### WEEK 11 - Intermediate Programming with Data ################
+# Supervised Learning
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+import matplotlib.pyplot as plt
+import random
+import numpy as np
+# Load the digits dataset
+digits = load_digits()
+print(digits.data.shape)
+# Split into testing and training, set up a classifier
+X_train, X_test, y_train, y_test = train_test_split(digits.data, digits.target,
+random_state = 11)
+knn = KNeighborsClassifier()
+knn.fit(X = X_train, y = y_train)
+# Try out one number image at a time, just to see what we get
+which = random.randint(0, 1796)
+print(digits.data[which])
+print(digits.images[which])
+plt.imshow(digits.images[which], cmap = plt.cm.gray_r)
+predicted = knn.predict(X = digits.data[which].reshape(1, -1))
+print("Predicted for data......", predicted)
+##### Testing our own hand-written image
+img = plt.imread("five.png")
+# Convert to the correct format (2d instead of 3d) and
+# put the values in range 0-16
+img = np.dot(img[...,:3], [1, 1, 1])
+img = (16-img * 16).astype(int)
+plt.figure(2)
+plt.imshow(img, cmap = plt.cm.gray_r)
+predicted = knn.predict(img.flatten().reshape(1, -1))
+print("Predicted for my hand-drawn image.....", predicted)
+# Now, throw the whole dataset at it
+# Plot the first 24 images
+figure, axes = plt.subplots(nrows = 4, ncols = 6, figsize = (6, 4))
+for item in zip(axes.ravel(), digits.images, digits.target):
+    axes, image, target = item
+    axes.imshow(image, cmap=plt.cm.gray_r)
+    axes.set_xticks([]) # remove x-axis tick marks
+    axes.set_yticks([]) # remove y-axis tick marks
+    axes.set_title(target)
+    plt.tight_layout()
+predicted = knn.predict(X = X_test)
+expected = y_test
+wrong = [(p, e) for (p, e) in zip(predicted, expected) if p != e]
+print(wrong)
+print(f'{knn.score(X_test, y_test):.2%}')
+#%% Classification report
+# conda install scikit-learn
+from sklearn import metrics
+# Example A
+# Constants
+C="Cat"
+F="Fish"
+H="Hen"
+# True values
+actual = [C,C,C,C,C,C, F,F,F,F,F,F,F,F,F,F, H,H,H,H,H,H,H,H,H]
+# Predicted values
+predicted = [C,C,C,C,H,F, C,C,C,C,C,C,H,H,F,F, C,C,C,H,H,H,H,H,H]
+# Print the confusion matrix
+matrix = metrics.confusion_matrix(actual, predicted)
+print("Confusion Matrix:\n", matrix)
+# Print the precision and recall, among other metrics
+report = metrics.classification_report(actual, predicted, digits=3)
+print("Classification Report:\n",report)
+#%% Example B
+# Constants
+S='setosa'
+E='versicolor'
+I='virginica'
+actual = [S]*50 + [E]*50 + [I]*50
+predicted = [S]*50 + [E]*47 + [I]*3 + [I]*47 + [E]*3
+# Print the confusion matrix
+matrix = metrics.confusion_matrix(actual, predicted)
+print("Confusion Matrix:\n", matrix)
+# Print the precision and recall, among other metrics
+report = metrics.classification_report(actual, predicted, digits=3)
+print("Classification Report:\n",report)
+# Get just the f1 score - see knn.pdf slides for details
+acc = metrics.accuracy_score(actual, predicted)
+f1 = metrics.f1_score(actual, predicted, average='macro')
+print('Accuracy: ', acc)
+print('F1-Score: ', f1)
+
+
+# In[ ]:
+
+
+
+
